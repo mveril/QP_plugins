@@ -1,4 +1,4 @@
-subroutine CCSD(maxSCF,thresh,max_diis,doCCSDT,nBas,nEl,ERI,ENuc,ERHF,eHF)
+subroutine CCSD
 
 ! CCSD module
 
@@ -6,18 +6,19 @@ subroutine CCSD(maxSCF,thresh,max_diis,doCCSDT,nBas,nEl,ERI,ENuc,ERHF,eHF)
 
 ! Input variables
 
-  integer,intent(in)            :: maxSCF
-  integer,intent(in)            :: max_diis
-  double precision,intent(in)   :: thresh
+  integer                       :: maxSCF
+  integer                       :: max_diis
+  double precision              :: thresh
 
-  logical,intent(in)            :: doCCSDT
-  integer,intent(in)            :: nBas,nEl
-  double precision,intent(in)   :: ENuc,ERHF
-  double precision,intent(in)   :: eHF(nBas)
-  double precision,intent(in)   :: ERI(nBas,nBas,nBas,nBas)
+  logical                       :: doCCSDT
+  integer                       :: nBas,nEl
+  double precision              :: ERHF
+  double precision,allocatable  :: eHF(:)
+  double precision,allocatable  :: ERI(:,:,:,:)
 
 ! Local variables
 
+  integer                       :: p,q,r,s
   double precision              :: start_CCSDT,end_CCSDT,t_CCSDT
   integer                       :: nBas2
   integer                       :: nO
@@ -27,7 +28,7 @@ subroutine CCSD(maxSCF,thresh,max_diis,doCCSDT,nBas,nEl,ERI,ENuc,ERHF,eHF)
   double precision              :: EcMP2
   double precision              :: ECCSD,EcCCSD
   double precision              :: EcCCT
-
+  double precision              :: get_two_e_integral 
   double precision,allocatable  :: seHF(:)
   double precision,allocatable  :: sERI(:,:,:,:)
   double precision,allocatable  :: dbERI(:,:,:,:)
@@ -71,6 +72,30 @@ subroutine CCSD(maxSCF,thresh,max_diis,doCCSDT,nBas,nEl,ERI,ENuc,ERHF,eHF)
   write(*,*)'**************************************'
   write(*,*)
 
+! IRP init  
+  provide cc_mode
+  if (cc_mode=='CCSDT') then
+    doCCSDT=.true.
+  else
+    doCCSDT=.false.
+  end if
+  nBas=mo_num
+  nEl=elec_num
+  ERHF=hf_energy
+  allocate(eHF(nBas))
+  eHF(:)=fock_matrix_diag_mo(:)
+  provide mo_two_e_integrals_in_map
+  allocate(ERI(nBas,nBas,nBas,nBas))
+  do s=1,nBas
+    do r=1,nBas
+      do q=1,nBas
+        do p=1,nBas 
+          ERI(p,q,r,s)=get_two_e_integral(p,q,r,s,mo_two_e_integrals_in_map)
+        end do
+      end do
+    end do
+  end do
+
 ! Spatial to spin orbitals
 
   nBas2 = 2*nBas
@@ -78,7 +103,9 @@ subroutine CCSD(maxSCF,thresh,max_diis,doCCSDT,nBas,nEl,ERI,ENuc,ERHF,eHF)
   allocate(seHF(nBas2),sERI(nBas2,nBas2,nBas2,nBas2))
 
   call spatial_to_spin_MO_energy(nBas,eHF,nBas2,seHF)
+  deallocate(eHF)
   call spatial_to_spin_ERI(nBas,ERI,nBas2,sERI)
+  deallocate(ERI)
 
 ! Antysymmetrize ERIs
 
@@ -201,7 +228,7 @@ subroutine CCSD(maxSCF,thresh,max_diis,doCCSDT,nBas,nEl,ERI,ENuc,ERHF,eHF)
     ECCSD = ERHF + EcCCSD
 
     write(*,'(1X,A1,1X,I3,1X,A1,1X,F16.10,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X)') &
-      '|',nSCF,'|',ECCSD+ENuc,'|',EcCCSD,'|',Conv,'|'
+      '|',nSCF,'|',ECCSD,'|',EcCCSD,'|',Conv,'|'
 
   end do
   write(*,*)'----------------------------------------------------'
