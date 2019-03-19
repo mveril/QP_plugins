@@ -14,7 +14,7 @@ program CC
     case ( 'CCSD' )
     call CCSD
     case ( 'CCSDT' )
-    call CCSDT
+    call CCSD
     case default
     print *, "Error noa", trim(cc_mode),"available"
   end select
