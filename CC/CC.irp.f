@@ -6,7 +6,8 @@ program CC
   ! Coupled cluster
   ! This program perform
   END_DOC
-  PROVIDE cc_mode
+  provide cc_mode
+  provide mo_two_e_integrals_in_map
   select case ( trim(cc_mode) )
     case ( 'CCD' )
     call CCD
