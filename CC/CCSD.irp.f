@@ -74,7 +74,7 @@ subroutine CCSD
 
 ! IRP init  
   provide cc_mode
-  if (cc_mode=='CCSDT') then
+  if (trim(cc_mode)=='CCSDT') then
     doCCSDT=.true.
   else
     doCCSDT=.false.
