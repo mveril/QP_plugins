@@ -1,13 +1,22 @@
-function kronecker_delta(i,j)
+!------------------------------------------------------------------------
+function Kronecker_delta(i,j) result(delta)
+
+! Kronecker Delta
+
   implicit none
-  BEGIN_DOC
-    ! Apply Kronecker_delta operator
-  END_DOC
-  integer,intent(in)  :: i,j
-  integer :: kronecker_delta
-  if (i==j) then
-    Kronecker_delta=1
+
+! Input variables
+
+  integer,intent(in)            :: i,j
+
+! Output variables
+
+  double precision              :: delta
+
+  if(i == j) then
+    delta = 1d0
   else
-    Kronecker_delta=0
-  end if
-end function kronecker_delta
+    delta = 0d0
+  endif
+
+end function Kronecker_delta
