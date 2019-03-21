@@ -3,19 +3,20 @@ program CC
   BEGIN_DOC
   ! CC
   ! Coupled cluster
-  ! Coupled cluster
-  ! This program perform
+  ! 
+  ! This program perform coupled cluster calculation
+  ! CCD
+  ! CCSD
+  ! or CCSD(T)
   END_DOC
   provide cc_mode
-  provide mo_two_e_integrals_in_map
   select case ( trim(cc_mode) )
     case ( 'CCD' )
     call CCD
-    case ( 'CCSD' )
-    call CCSD
-    case ( 'CCSDT' )
+    case ( 'CCSD', 'CCSDT' )
     call CCSD
     case default
-    print *, "Error noa", trim(cc_mode),"available"
+    print *, "Error method ", trim(cc_mode),"not available"
+    print *, "Only CCD, CCSD and CCSDT are available"
   end select
 end

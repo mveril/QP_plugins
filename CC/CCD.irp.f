@@ -4,7 +4,7 @@ subroutine CCD
 
   implicit none
 
-! Input variables
+! Input variables (provided by IRP)
 
   integer                       :: maxSCF
   integer                       :: max_diis
@@ -50,8 +50,6 @@ subroutine CCD
   double precision,allocatable  :: r2(:,:,:,:)
   double precision,allocatable  :: t2(:,:,:,:)
 
-! Get variables from IRP
-! provide cc_n_it_max cc_thresh cc_threshold_diis cc_max_dim_di
 ! IRP init  
   maxSCF=cc_n_it_max
   max_diis=cc_max_dim_diis

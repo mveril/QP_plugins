@@ -4,7 +4,7 @@ subroutine CCSD
 
   implicit none
 
-! Input variables
+! Input variables (provided by IRP)
 
   integer                       :: maxscf
   integer                       :: max_diis
