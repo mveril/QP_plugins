@@ -266,13 +266,14 @@ subroutine CCSD
 ! (T) correction
 !------------------------------------------------------------------------
   if(doCCSDT) then
-
-    call cpu_time(start_CCSDT)
+    write(*,*) "Starting (T) calculation"
+!   call cpu_time(start_CCSDT)V
     call CCSDT(nO,nV,eO,eV,OOVV,VVVO,VOOO,t1,t2,EcCCT)
-    call cpu_time(end_CCSDT)
+!   call cpu_time(end_CCSDT)
+    call write_time(6)
 
-     t_CCSDT = end_CCSDT - start_CCSDT
-     write(*,'(A65,1X,F9.3,A8)') 'Total CPU time for (T) = ',t_CCSDT,' seconds'
+!    t_CCSDT = end_CCSDT - start_CCSDT
+!    write(*,'(A65,1X,F9.3,A8)') 'Total CPU time for (T) = ',t_CCSDT,' seconds'
      write(*,*)
 
     write(*,*)
