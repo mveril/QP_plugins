@@ -18,6 +18,7 @@ subroutine form_delta_OOOVVV(nO,nV,eO,eV,delta)
 
   double precision,intent(out)  :: delta(nO,nO,nO,nV,nV,nV)
 
+!$OMP PARALLEL DO COLLAPSE(6)
     do i=1,nO
       do j=1,nO
         do k=1,nO
@@ -33,5 +34,6 @@ subroutine form_delta_OOOVVV(nO,nV,eO,eV,delta)
         enddo
       enddo
     enddo
+!$OMP END PARALLEL DO
 
 end subroutine form_delta_OOOVVV

@@ -18,6 +18,7 @@ subroutine spatial_to_spin_ERI(nBas,ERI,nBas2,sERI)
 
   double precision,intent(out)  :: sERI(nBas2,nBas2,nBas2,nBas2)
 
+!$OMP PARALLEL DO COLLAPSE(4)
     do p=1,nBas2
       do q=1,nBas2
         do r=1,nBas2
@@ -31,5 +32,6 @@ subroutine spatial_to_spin_ERI(nBas,ERI,nBas2,sERI)
         enddo
       enddo
     enddo
+!$OMP END PARALLEL DO
 
 end subroutine spatial_to_spin_ERI

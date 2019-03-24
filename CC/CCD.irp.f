@@ -109,8 +109,10 @@ subroutine CCD
   allocate(eO(nO),eV(nV))
   allocate(delta_OOVV(nO,nO,nV,nV))
 
+  !$OMP PARALLEL WORKSHARE
   eO(:) = seHF(1:nO)
   eV(:) = seHF(nO+1:nBas2)
+  !$OMP END PARALLEL WORKSHARE
 
   call form_delta_OOVV(nO,nV,eO,eV,delta_OOVV)
 
@@ -120,10 +122,14 @@ subroutine CCD
 
   allocate(OOOO(nO,nO,nO,nO),OOVV(nO,nO,nV,nV),OVOV(nO,nV,nO,nV),VVVV(nV,nV,nV,nV))
 
+  !$OMP PARALLEL WORKSHARE
+
   OOOO(:,:,:,:) = dbERI(   1:nO   ,   1:nO   ,   1:nO   ,   1:nO   )
   OOVV(:,:,:,:) = dbERI(   1:nO   ,   1:nO   ,nO+1:nBas2,nO+1:nBas2)
   OVOV(:,:,:,:) = dbERI(   1:nO   ,nO+1:nBas2,   1:nO   ,nO+1:nBas2)
   VVVV(:,:,:,:) = dbERI(nO+1:nBas2,nO+1:nBas2,nO+1:nBas2,nO+1:nBas2)
+
+  !$OMP END PARALLEL WORKSHARE
 
   deallocate(dbERI)
  
@@ -131,7 +137,9 @@ subroutine CCD
 
   allocate(t2(nO,nO,nV,nV))
 
+  !$OMP PARALLEL WORKSHARE
   t2(:,:,:,:) = -OOVV(:,:,:,:)/delta_OOVV(:,:,:,:)
+  !$OMP END PARALLEL WORKSHARE
 
   EcMP2 = 0.25d0*dot_product(pack(OOVV,.true.),pack(t2,.true.))
   write(*,'(1X,A10,1X,F10.6)') 'Ec(MP2) = ',EcMP2
@@ -175,7 +183,9 @@ subroutine CCD
 
 !   Compute residual
 
+  !$OMP PARALLEL WORKSHARE
     r2(:,:,:,:) = OOVV(:,:,:,:) + delta_OOVV(:,:,:,:)*t2(:,:,:,:) + u(:,:,:,:) + v(:,:,:,:)
+  !$OMP END PARALLEL WORKSHARE
 
 !   Check convergence 
 

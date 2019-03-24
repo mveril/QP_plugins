@@ -17,12 +17,13 @@ subroutine spatial_to_spin_MO_energy(nBas,e,nBas2,se)
 
   double precision,intent(out)  :: se(nBas2)
 
+    !$OMP PARALLEL DO
     do p=1,nBas2
 
       se(p) = e((p+1)/2)
 
     enddo
-
+    !$OMP END PARALLEL DO
 ! print*,'MO energies in spinorbital basis'
 ! call matout(nBas2,1,se)
 

@@ -31,6 +31,7 @@ subroutine MP2(nBas,nC,nO,nV,nR,ERI,ENuc,EHF,e,EcMP2)
 
   E2a = 0d0
   E2b = 0d0
+!$OMP PARALLEL DO COLLAPSE(4)
   do i=nC+1,nO
   do j=nC+1,nO
     do a=nO+1,nBas-nR
@@ -50,7 +51,7 @@ subroutine MP2(nBas,nC,nO,nV,nR,ERI,ENuc,EHF,e,EcMP2)
     enddo
   enddo
   enddo
-
+!$OMP END PARALLEL DO
   EcMP2(2) = 2d0*E2a
   EcMP2(3) = -E2b
   EcMP2(1) = EcMP2(2) + EcMP2(3)

@@ -22,8 +22,11 @@ subroutine form_v(nO,nV,X1,X2,X3,X4,t2,v)
 
   double precision,intent(out)  :: v(nO,nO,nV,nV)
 
-  v(:,:,:,:) = 0d0
- 
+  !$OMP PARALLEL WORKSHARE
+  V(:,:,:,:) = 0D0
+  !$OMP END PARALLEL WORKSHARE
+
+!$OMP PARALLEL DO COLLAPSE(6)
   do i=1,nO
     do j=1,nO
       do a=1,nV
@@ -37,7 +40,9 @@ subroutine form_v(nO,nV,X1,X2,X3,X4,t2,v)
       enddo
     enddo
   enddo
+!$OMP END PARALLEL DO
 
+!$OMP PARALLEL DO COLLAPSE(5)
   do i=1,nO
     do j=1,nO
       do a=1,nV
@@ -49,7 +54,9 @@ subroutine form_v(nO,nV,X1,X2,X3,X4,t2,v)
       enddo
     enddo
   enddo
+!$OMP END PARALLEL DO
 
+!$OMP PARALLEL DO
   do i=1,nO
     do j=1,nO
       do a=1,nV
@@ -61,7 +68,9 @@ subroutine form_v(nO,nV,X1,X2,X3,X4,t2,v)
       enddo
     enddo
   enddo
+!$OMP END PARALLEL DO
 
+!$OMP PARALLEL DO COLLAPSE(6)
   do i=1,nO
     do j=1,nO
       do a=1,nV
@@ -75,5 +84,6 @@ subroutine form_v(nO,nV,X1,X2,X3,X4,t2,v)
       enddo
     enddo
   enddo
+!$OMP END PARALLEL DO
 
 end subroutine form_v

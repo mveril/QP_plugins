@@ -21,8 +21,11 @@ subroutine form_u(nO,nV,OOOO,VVVV,OVOV,t2,u)
 
   double precision,intent(out)  :: u(nO,nO,nV,nV)
 
+!$OMP PARALLEL WORKSHARE
   u(:,:,:,:) = 0d0
- 
+!$OMP END PARALLEL WORKSHARE
+
+!$OMP PARALLEL DO COLLAPSE(6)
   do i=1,nO
     do j=1,nO
       do a=1,nV
@@ -36,7 +39,9 @@ subroutine form_u(nO,nV,OOOO,VVVV,OVOV,t2,u)
       enddo
     enddo
   enddo
+!$OMP END PARALLEL DO
 
+!$OMP PARALLEL DO COLLAPSE(6)
   do i=1,nO
     do j=1,nO
       do k=1,nO
@@ -50,7 +55,9 @@ subroutine form_u(nO,nV,OOOO,VVVV,OVOV,t2,u)
       enddo
     enddo
   enddo
+!$OMP END PARALLEL DO
 
+!$OMP PARALLEL DO COLLAPSE(6)
   do i=1,nO
     do j=1,nO
       do k=1,nO
@@ -67,5 +74,5 @@ subroutine form_u(nO,nV,OOOO,VVVV,OVOV,t2,u)
       enddo
     enddo
   enddo
-
+!$OMP END PARALLEL DO
 end subroutine form_u

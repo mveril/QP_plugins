@@ -24,13 +24,16 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Initialization
 
-  X1(:,:,:,:) = 0d0
+  !$OMP PARALLEL WORKSHARE
+  X1(:,:,:,:) = 0D0
   X2(:,:)     = 0d0
   X3(:,:)     = 0d0
   X4(:,:,:,:) = 0d0
+  !$OMP END PARALLEL WORKSHARE
 
 ! Build X1
 
+!$OMP PARALLEL DO COLLAPSE(6)
   do k=1,nO
     do l=1,nO
       do i=1,nO
@@ -44,9 +47,11 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
       enddo
     enddo
   enddo
+!$OMP END PARALLEL DO
 
 ! Build X2
 
+!$OMP PARALLEL DO COLLAPSE(5)
   do b=1,nV
     do c=1,nV
       do k=1,nO
@@ -59,8 +64,10 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
     enddo
   enddo
 
+!$OMP END PARALLEL DO
 ! Build X3
 
+!$OMP PARALLEL DO COLLAPSE(5)
   do k=1,nO
     do j=1,nO
       do l=1,nO
@@ -73,8 +80,10 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
     enddo
   enddo
 
+!$OMP END PARALLEL DO
 ! Build X4
 
+!$OMP PARALLEL DO COLLAPSE(6)
   do i=1,nO
     do l=1,nO
       do a=1,nV
@@ -88,5 +97,5 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
       enddo
     enddo
   enddo
-
+!$OMP END PARALLEL DO
 end subroutine form_X
