@@ -23,12 +23,12 @@ subroutine form_u(nO,nV,OOOO,VVVV,OVOV,t2,u)
 
   u(:,:,:,:) = 0d0
  
-  do i=1,nO
-    do j=1,nO
-      do a=1,nV
-        do b=1,nV
-          do c=1,nV
-            do d=1,nV
+  do b=1,nV
+    do a=1,nV
+      do j=1,nO
+        do i=1,nO
+          do d=1,nV
+            do c=1,nV
               u(i,j,a,b) = u(i,j,a,b) + 0.5d0*VVVV(a,b,c,d)*t2(i,j,c,d)
             enddo
           enddo
@@ -37,12 +37,12 @@ subroutine form_u(nO,nV,OOOO,VVVV,OVOV,t2,u)
     enddo
   enddo
 
-  do i=1,nO
-    do j=1,nO
-      do k=1,nO
-        do l=1,nO
-          do a=1,nV
-            do b=1,nV
+  do b=1,nV
+    do a=1,nV
+      do j=1,nO
+        do i=1,nO
+          do l=1,nO
+            do k=1,nO
               u(i,j,a,b) = u(i,j,a,b) + 0.5d0*OOOO(k,l,i,j)*t2(k,l,a,b)
             enddo
           enddo
@@ -51,12 +51,12 @@ subroutine form_u(nO,nV,OOOO,VVVV,OVOV,t2,u)
     enddo
   enddo
 
-  do i=1,nO
-    do j=1,nO
-      do k=1,nO
-        do a=1,nV
-          do b=1,nV
-            do c=1,nV
+  do b=1,nV
+    do a=1,nV
+      do j=1,nO
+        do i=1,nO
+          do c=1,nV
+            do k=1,nO
               u(i,j,a,b) = u(i,j,a,b) - OVOV(k,b,j,c)*t2(i,k,a,c) &
                                       + OVOV(k,a,j,c)*t2(i,k,b,c) &
                                       - OVOV(k,a,i,c)*t2(j,k,b,c) &

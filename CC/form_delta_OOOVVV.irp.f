@@ -18,12 +18,12 @@ subroutine form_delta_OOOVVV(nO,nV,eO,eV,delta)
 
   double precision,intent(out)  :: delta(nO,nO,nO,nV,nV,nV)
 
-    do i=1,nO
-      do j=1,nO
-        do k=1,nO
-          do a=1,nV
-            do b=1,nV
-              do c=1,nV
+    do c=1,nV
+      do b=1,nV
+        do a=1,nV
+          do k=1,nO
+            do j=1,nO
+              do i=1,nO
 
                 delta(i,j,k,a,b,c) = eV(a) + eV(b) + eV(c) - eO(i) - eO(j) - eO(k)
 

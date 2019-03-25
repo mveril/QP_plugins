@@ -24,12 +24,12 @@ subroutine form_ubb(nO,nV,VVVO,VOOO,t2,ubb)
 
   ubb(:,:,:,:,:,:) = 0d0
 
-  do i=1,nO
-    do j=1,nO
-      do k=1,nO
-        do a=1,nV
-          do b=1,nV
-            do c=1,nV
+  do c=1,nV
+    do b=1,nV
+      do a=1,nV
+        do k=1,nO
+          do j=1,nO
+            do i=1,nO
 
               do e=1,nV
                 ubb(i,j,k,a,b,c) = ubb(i,j,k,a,b,c)          &

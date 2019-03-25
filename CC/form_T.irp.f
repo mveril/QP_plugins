@@ -23,12 +23,12 @@ subroutine form_T(nO,nV,delta_OOOVVV,ub,ubb,EcCCT)
 
   EcCCT = 0d0
 
-  do i=1,nO
-    do j=1,nO
-      do k=1,nO
-        do a=1,nV
-          do b=1,nV
-            do c=1,nV
+  do c=1,nV
+    do b=1,nV
+      do a=1,nV
+        do k=1,nO
+          do j=1,nO
+            do i=1,nO
 
               EcCCT = EcCCT                                &
                     + (ub(i,j,k,a,b,c) + ubb(i,j,k,a,b,c)) &

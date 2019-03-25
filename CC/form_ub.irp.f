@@ -21,12 +21,12 @@ subroutine form_ub(nO,nV,OOVV,t1,ub)
 
   double precision,intent(out)  :: ub(nO,nO,nO,nV,nV,nV)
 
-  do i=1,nO
-    do j=1,nO
-      do k=1,nO
-        do a=1,nV
-          do b=1,nV
-            do c=1,nV
+  do c=1,nV
+    do b=1,nV
+      do a=1,nV
+        do k=1,nO
+          do j=1,nO
+            do i=1,nO
 
               ub(i,j,k,a,b,c) = t1(i,a)*OOVV(j,k,b,c) &
                               + t1(i,b)*OOVV(j,k,c,a) &

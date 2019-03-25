@@ -32,8 +32,8 @@ subroutine form_r1(nO,nV,OVVO,OVVV,OOOV,hvv,hoo,hvo,t1,t2,tau,r1)
 
   r1(:,:) = 0d0
 
-  do i=1,nO
-      do a=1,nV
+  do a=1,nV
+      do i=1,nO
 
         do b=1,nV
           r1(i,a) = r1(i,a) + hvv(b,a)*t1(i,b)
@@ -49,23 +49,23 @@ subroutine form_r1(nO,nV,OVVO,OVVV,OOOV,hvv,hoo,hvo,t1,t2,tau,r1)
           end do
         end do
 
-        do j=1,nO
-          do b=1,nV
+        do b=1,nV
+          do j=1,nO
             r1(i,a) = r1(i,a) + OVVO(i,b,a,j)*t1(j,b)
           end do
         end do
 
-        do j=1,nO
+        do c=1,nV
           do b=1,nV
-            do c=1,nV
+            do j=1,nO
               r1(i,a) = r1(i,a) - OVVV(j,a,b,c)*tau(i,j,b,c)
             end do
           end do
         end do
 
-        do j=1,nO
+        do b=1,nV
           do k=1,nO
-            do b=1,nV
+            do j=1,nO
               r1(i,a) = r1(i,a) - OOOV(j,k,i,b)*tau(j,k,a,b)
             end do
           end do

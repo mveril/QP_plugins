@@ -19,10 +19,10 @@ subroutine antisymmetrize_ERI(ispin,nBas,ERI,db_ERI)
 
   if(ispin == 1) then
 
-    do i=1,nBas
-      do j=1,nBas
-        do k=1,nBas
-          do l=1,nBas
+    do l=1,nBas
+      do k=1,nBas
+        do j=1,nBas
+          do i=1,nBas
             db_ERI(i,j,k,l) = 2d0*ERI(i,j,k,l) - ERI(i,j,l,k)
           enddo
         enddo
@@ -31,10 +31,10 @@ subroutine antisymmetrize_ERI(ispin,nBas,ERI,db_ERI)
 
   elseif(ispin == 2) then
 
-    do i=1,nBas
-      do j=1,nBas
-        do k=1,nBas
-          do l=1,nBas
+    do l=1,nBas
+      do k=1,nBas
+        do j=1,nBas
+          do i=1,nBas
             db_ERI(i,j,k,l) = ERI(i,j,k,l) - ERI(i,j,l,k)
           enddo
         enddo

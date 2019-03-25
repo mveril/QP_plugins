@@ -62,10 +62,10 @@ subroutine form_h(nO,nV,eO,eV,OOVV,t1,tau,hvv,hoo,hvo)
 
   hvo(:,:) = 0d0
 
-  do b=1,nV 
-    do j=1,nO
-      do k=1,nO
-        do c=1,nV
+  do j=1,nO 
+    do b=1,nV
+      do c=1,nV
+        do k=1,nO
 
           hvo(b,j) = hvo(b,j) + OOVV(j,k,b,c)*t1(k,c)
 

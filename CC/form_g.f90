@@ -28,10 +28,10 @@ subroutine form_g(nO,nV,hvv,hoo,VOVV,OOOV,t1,gvv,goo)
 
   gvv(:,:) = hvv(:,:)
 
-  do c=1,nV 
-    do a=1,nV
-      do k=1,nO
-        do d=1,nV
+  do a=1,nV 
+    do c=1,nV
+      do d=1,nV
+        do k=1,nO
           gvv(c,a) = gvv(c,a) + VOVV(a,k,c,d)*t1(k,d)
         end do
       end do
@@ -40,10 +40,10 @@ subroutine form_g(nO,nV,hvv,hoo,VOVV,OOOV,t1,gvv,goo)
 
   goo(:,:) = hoo(:,:)
 
-  do i=1,nO
-    do k=1,nO
-      do l=1,nO
-        do c=1,nV
+  do k=1,nO
+    do i=1,nO
+      do c=1,nV
+        do l=1,nO
           goo(i,k) = goo(i,k) + OOOV(k,l,i,c)*t1(l,c)
         end do
       end do

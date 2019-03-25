@@ -34,10 +34,10 @@ subroutine form_r2(nO,nV,OOVV,OVOO,OVVV,OVVO,gvv,goo,aoooo,bvvvv,hovvo,t1,t2,tau
 
   r2(:,:,:,:) = OOVV(:,:,:,:)
 
-  do i=1,nO
-    do j=1,nO
-      do a=1,nV
-        do b=1,nV
+  do b=1,nV
+    do a=1,nV
+      do j=1,nO
+        do i=1,nO
 
           do k=1,nO
             do l=1,nO
@@ -45,8 +45,8 @@ subroutine form_r2(nO,nV,OOVV,OVOO,OVVV,OVVO,gvv,goo,aoooo,bvvvv,hovvo,t1,t2,tau
             end do
           end do
 
-          do c=1,nV
-            do d=1,nV
+          do d=1,nV
+            do c=1,nV
               r2(i,j,a,b) = r2(i,j,a,b) + bvvvv(c,d,a,b)*tau(i,j,c,d)
             end do
           end do
@@ -101,32 +101,32 @@ subroutine form_r2(nO,nV,OOVV,OVOO,OVVV,OVVO,gvv,goo,aoooo,bvvvv,hovvo,t1,t2,tau
             end do
           end do
 
-          do k=1,nO
-            do c=1,nV
+          do c=1,nV
+            do k=1,nO
                r2(i,j,a,b) = r2(i,j,a,b) + OVVO(j,c,a,k)*t1(i,c)*t1(k,b)
             end do
           end do
 
-          do k=1,nO
-            do c=1,nV
+          do c=1,nV
+            do k=1,nO
               r2(i,j,a,b) = r2(i,j,a,b) - hovvo(i,c,b,k)*t2(j,k,a,c)
             end do
           end do
 
-          do k=1,nO
-            do c=1,nV
+          do c=1,nV
+            do k=1,nO
               r2(i,j,a,b) = r2(i,j,a,b) + OVVO(i,c,b,k)*t1(j,c)*t1(k,a)
             end do
           end do
 
-          do k=1,nO
-            do c=1,nV
+          do c=1,nV
+            do k=1,nO
               r2(i,j,a,b) = r2(i,j,a,b) + hovvo(j,c,b,k)*t2(i,k,a,c)
             end do
           end do
 
-          do k=1,nO
-            do c=1,nV
+          do c=1,nV
+            do k=1,nO
               r2(i,j,a,b) = r2(i,j,a,b) - OVVO(j,c,b,k)*t1(i,c)*t1(k,a)
             end do
           end do

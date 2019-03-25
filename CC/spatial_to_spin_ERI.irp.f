@@ -18,10 +18,10 @@ subroutine spatial_to_spin_ERI(nBas,ERI,nBas2,sERI)
 
   double precision,intent(out)  :: sERI(nBas2,nBas2,nBas2,nBas2)
 
-    do p=1,nBas2
-      do q=1,nBas2
-        do r=1,nBas2
-          do s=1,nBas2
+    do s=1,nBas2
+      do r=1,nBas2
+        do q=1,nBas2
+          do p=1,nBas2
 
             sERI(p,q,r,s) = Kronecker_delta(mod(p,2),mod(r,2)) &
                           * Kronecker_delta(mod(q,2),mod(s,2)) &

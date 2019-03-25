@@ -30,11 +30,10 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
   X4(:,:,:,:) = 0d0
 
 ! Build X1
-
-  do k=1,nO
-    do l=1,nO
-      do i=1,nO
-        do j=1,nO
+  do j=1,nO
+    do i=1,nO
+      do l=1,nO
+        do k=1,nO
           do c=1,nV
             do d=1,nV
               X1(k,l,i,j) = X1(k,l,i,j) + OOVV(k,l,c,d)*t2(i,j,c,d)
@@ -47,10 +46,10 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Build X2
 
-  do b=1,nV
-    do c=1,nV
-      do k=1,nO
-        do l=1,nO
+  do c=1,nV
+    do b=1,nV
+      do l=1,nO
+        do k=1,nO
           do d=1,nV
             X2(b,c) = X2(b,c) + OOVV(k,l,c,d)*t2(k,l,b,d)
           enddo
@@ -61,11 +60,11 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Build X3
 
-  do k=1,nO
-    do j=1,nO
+  do j=1,nO
+    do k=1,nO
       do l=1,nO
-        do c=1,nV
-          do d=1,nV
+        do d=1,nV
+          do c=1,nV
             X3(k,j) = X3(k,j) + OOVV(k,l,c,d)*t2(j,l,c,d)
           enddo
         enddo
@@ -75,10 +74,10 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Build X4
 
-  do i=1,nO
-    do l=1,nO
-      do a=1,nV
-        do d=1,nV
+  do d=1,nV
+    do a=1,nV
+      do l=1,nO
+        do i=1,nO
           do k=1,nO
             do c=1,nV
               X4(i,l,a,d) = X4(i,l,a,d) + OOVV(k,l,c,d)*t2(i,k,a,c) 
