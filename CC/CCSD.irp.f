@@ -77,7 +77,7 @@ subroutine CCSD
   maxSCF=cc_n_it_max
   max_diis=cc_max_dim_diis
   thresh=cc_thresh
-  if (trim(cc_mode)=='CCSDT') then
+  if (trim(cc_mode)=='CCSD(T)') then
     doCCSDT=.true.
   else
     doCCSDT=.false.

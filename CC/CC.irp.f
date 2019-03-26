@@ -14,7 +14,7 @@ program CC
     case ( 'CCD' )
     call CCD
     call write_time(6)
-    case ( 'CCSD', 'CCSDT' )
+    case ( 'CCSD', 'CCSD(T)' )
     call CCSD
     call write_time(6)
     case default
