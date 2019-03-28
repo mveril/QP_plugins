@@ -285,6 +285,12 @@ subroutine CCSD
     write(*,*)'----------------------------------------------------'
     write(*,*)
 
+    call save_energy(ECCSD  + EcCCT)
+
+  else
+
+    call save_energy(ECCSD)
+
   end if
 
 end subroutine CCSD

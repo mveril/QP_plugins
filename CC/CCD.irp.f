@@ -214,6 +214,8 @@ subroutine CCD
 
     stop
 
+  else
+    call save_energy(ECCD)
   endif
 
 end subroutine CCD
