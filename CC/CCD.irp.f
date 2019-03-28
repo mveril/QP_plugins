@@ -7,7 +7,6 @@ subroutine CCD
 ! Input variables (provided by IRP)
 
   integer                       :: maxSCF
-  integer                       :: max_diis
   double precision              :: thresh
 
   integer                       :: nBas,nEl
@@ -52,7 +51,6 @@ subroutine CCD
 
 ! IRP init  
   maxSCF=cc_n_it_max
-  max_diis=cc_max_dim_diis
   thresh=cc_thresh
 
   nBas=mo_num

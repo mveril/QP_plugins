@@ -7,7 +7,6 @@ subroutine CCSD
 ! Input variables (provided by IRP)
 
   integer                       :: maxscf
-  integer                       :: max_diis
   double precision              :: thresh
 
   logical                       :: doCCSDT
@@ -75,7 +74,6 @@ subroutine CCSD
 ! IRP init  
   provide cc_mode
   maxSCF=cc_n_it_max
-  max_diis=cc_max_dim_diis
   thresh=cc_thresh
   if (trim(cc_mode)=='CCSD(T)') then
     doCCSDT=.true.
