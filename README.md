@@ -42,4 +42,4 @@ It's **only available on GNU/Linux**. It's also possible to install it on Window
 ### More info
 [Website](https://quantumpackage.github.io/qp2)
 
-[documentation](https://quantum-package.readthedocs.io/en/master/)
+[Documentation](https://quantum-package.readthedocs.io/en/master/)
