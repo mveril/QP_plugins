@@ -28,7 +28,9 @@ It's work but I am working on improvements
 ```bash
 qp plugins install CC
 ```
+### Options
 
+You can choose the method using the `cc_mode` variable of th EZFIO database
 ## About Quantum package
 
 Quantum package is an extensible quantum chemistry software build on my lab
