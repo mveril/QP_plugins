@@ -23,7 +23,7 @@ subroutine CCD
   integer                       :: nSCF
   double precision              :: Conv
   double precision              :: EcMP2
-  double precision              :: get_two_e_integral
+  double precision              :: get_two_e_integral,u_dot_v
   double precision              :: ECCD,EcCCD
   double precision,allocatable  :: seHF(:)
   double precision,allocatable  :: sERI(:,:,:,:)
@@ -131,7 +131,7 @@ subroutine CCD
 
   t2(:,:,:,:) = -OOVV(:,:,:,:)/delta_OOVV(:,:,:,:)
 
-  EcMP2 = 0.25d0*dot_product(pack(OOVV,.true.),pack(t2,.true.))
+  EcMP2 = 0.25d0*u_dot_v(pack(OOVV,.true.),pack(t2,.true.),size(OOVV))
   write(*,'(1X,A10,1X,F10.6)') 'Ec(MP2) = ',EcMP2
 
 ! Initialization
@@ -185,9 +185,9 @@ subroutine CCD
 
 !   Compute correlation energy
 
-    EcCCD = 0.25d0*dot_product(pack(OOVV,.true.),pack(t2,.true.))
+    EcCCD = 0.25d0*u_dot_v(pack(OOVV,.true.),pack(t2,.true.),size(OOVV))
 
-!   Dump results
+!   Dump resultS
 
     ECCD = ERHF + EcCCD
 

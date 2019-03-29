@@ -27,7 +27,7 @@ subroutine CCSD
   double precision              :: EcMP2
   double precision              :: ECCSD,EcCCSD
   double precision              :: EcCCT
-  double precision              :: get_two_e_integral 
+  double precision              :: get_two_e_integral,u_dot_v 
   double precision,allocatable  :: seHF(:)
   double precision,allocatable  :: sERI(:,:,:,:)
   double precision,allocatable  :: dbERI(:,:,:,:)
@@ -163,7 +163,7 @@ subroutine CCSD
   t2(:,:,:,:) = -OOVV(:,:,:,:)/delta_OOVV(:,:,:,:)
   call form_tau(nO,nV,t1,t2,tau)
 
-  EcMP2 = 0.5d0*dot_product(pack(OOVV,.true.),pack(tau,.true.))
+  EcMP2 = 0.5d0*u_dot_v(pack(OOVV,.true.),pack(tau,.true.),size(OOVV))
   write(*,'(1X,A10,1X,F10.6)') 'Ec(MP2) = ',EcMP2
 
 ! Initialization
@@ -222,7 +222,7 @@ subroutine CCSD
  
 !   Compute correlation energy
 
-    EcCCSD = 0.5d0*dot_product(pack(OOVV,.true.),pack(tau,.true.))
+    EcCCSD = 0.5d0*u_dot_v(pack(OOVV,.true.),pack(tau,.true.),size(OOVV))
 
 !   Dump results
 
