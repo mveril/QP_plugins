@@ -9,11 +9,16 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
   integer,intent(in)            :: nO,nV
   double precision,intent(in)   :: t2(nO,nO,nV,nV)
   double precision,intent(in)   :: OOVV(nO,nO,nV,nV)
+  double precision  :: rt2(nO**2,nV**2),rOOVV(nO**2,nV**2)
 
 ! Local variables
 
   integer                       :: i,j,k,l
   integer                       :: a,b,c,d
+  integer                       :: ij,ab,kl,cd
+  integer                       :: contract
+  double precision  :: gt2TX1(nO**2,nO**2) 
+  double precision  :: rX1(nO**2,nO**2) 
 
 ! Output variables
 
@@ -24,21 +29,33 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Initialization
 
+  do b=1,nV
+    do a=1,nV
+      ab=contract(a,b,nV)
+      do j=1,nO
+        do i=1,nO
+          ij=contract(i,j,nO)
+          rt2(ij,ab)=t2(i,j,a,b)
+          rOOVV(ij,ab)=OOVV(i,j,a,b)
+        end do
+      end do
+    end do
+  end do
+
   X1(:,:,:,:) = 0d0
   X2(:,:)     = 0d0
   X3(:,:)     = 0d0
   X4(:,:,:,:) = 0d0
 
 ! Build X1
+  gt2TX1 = matmul(rOOVV,transpose(rt2))
   do j=1,nO
     do i=1,nO
+     ij=contract(i,j,nO)
       do l=1,nO
         do k=1,nO
-          do c=1,nV
-            do d=1,nV
-              X1(k,l,i,j) = X1(k,l,i,j) + OOVV(k,l,c,d)*t2(i,j,c,d)
-            enddo
-          enddo
+          kl=contract(k,l,nO)
+          X1(k,l,i,j) = X1(k,l,i,j) + gt2TX1(kl,ij)
         enddo
       enddo
     enddo
