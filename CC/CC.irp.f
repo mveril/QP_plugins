@@ -19,6 +19,6 @@ program CC
     call write_time(6)
     case default
     print *, "Error method ", trim(cc_mode),"not available"
-    print *, "Only CCD, CCSD and CCSDT are available"
+    print *, "Only CCD, CCSD and CCSD(T) are available"
   end select
 end
