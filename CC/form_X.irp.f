@@ -48,7 +48,10 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
   X4(:,:,:,:) = 0d0
 
 ! Build X1
-  gt2TX1 = matmul(rOOVV,transpose(rt2))
+! pure intrinsic fortran equivalent
+! gt2TX1 = matmul(rOOVV,transpose(rt2))
+! dgemm
+  call dgemm('N','T',nO**2,nO**2,nV**2,1.d0,rOOVV,nO**2,rt2,nO**2,0.d0,gt2TX1,nO**2)
   do j=1,nO
     do i=1,nO
      ij=contract(i,j,nO)
