@@ -9,7 +9,7 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
   integer,intent(in)            :: nO,nV
   double precision,intent(in)   :: t2(nO,nO,nV,nV)
   double precision,intent(in)   :: OOVV(nO,nO,nV,nV)
-  double precision  :: rt2(nO**2,nV**2),rOOVV(nO**2,nV**2)
+  double precision              :: rt2(nO**2,nV**2),rOOVV(nO**2,nV**2)
 
 ! Local variables
 
@@ -17,8 +17,7 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
   integer                       :: a,b,c,d
   integer                       :: ij,ab,kl,cd
   integer                       :: contract
-  double precision  :: gt2TX1(nO**2,nO**2) 
-  double precision  :: rX1(nO**2,nO**2) 
+  double precision              :: gt2TX1(nO**2,nO**2) 
 
 ! Output variables
 
