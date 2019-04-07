@@ -15,10 +15,11 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
   integer                       :: i,j,k,l
   integer                       :: a,b,c,d
-  integer                       :: ij,ab,kl,cd,bd
+  integer                       :: ij,ab,kl,cd,bd,jl
   integer                       :: contract
   double precision              :: gt2TX1(nO**2,nO**2)
   double precision              :: gTt2X2(nV**2,nV**2)
+  double precision              :: gt2TX3(nO**2,nO**2)
 
 ! Output variables
 
@@ -81,14 +82,16 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Build X3
 
-  do j=1,nO
-    do k=1,nO
-      do l=1,nO
-        do d=1,nV
-          do c=1,nV
-            X3(k,j) = X3(k,j) + OOVV(k,l,c,d)*t2(j,l,c,d)
-          enddo
-        enddo
+! pure intrinsic fortran equivalent
+! gt2TX3 = matmul(rOOVV,transpose(rt2))
+! dgemm
+  call dgemm('N','T',nO**2,nO**2,nV**2,1.d0,rOOVV,nO**2,rt2,nO**2,0.d0,gt2TX3,nO**2)
+  do l=1,nO
+    do j=1,nO
+      jl=contract(j,l,nO)
+      do k=1,nO
+        kl=contract(k,l,nO)
+        X3(k,j) = X3(k,j) + gt2TX3(kl,jl)
       enddo
     enddo
   enddo
