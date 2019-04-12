@@ -17,9 +17,8 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
   integer                       :: a,b,c,d
   integer                       :: ij,ab,kl,cd,bd,jl
   integer                       :: contract
-  double precision              :: gt2TX1(nO**2,nO**2)
-  double precision              :: gTt2X2(nV**2,nV**2)
-  double precision              :: gt2TX3(nO**2,nO**2)
+  double precision              :: gt2T(nO**2,nO**2)
+  double precision              :: gTt2(nV**2,nV**2)
 
 ! Output variables
 
@@ -50,16 +49,16 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Build X1
 ! pure intrinsic fortran equivalent
-! gt2TX1 = matmul(rOOVV,transpose(rt2))
+! gt2T = matmul(rOOVV,transpose(rt2))
 ! dgemm
-  call dgemm('N','T',nO**2,nO**2,nV**2,1.d0,rOOVV,nO**2,rt2,nO**2,0.d0,gt2TX1,nO**2)
+  call dgemm('N','T',nO**2,nO**2,nV**2,1.d0,rOOVV,nO**2,rt2,nO**2,0.d0,gt2T,nO**2)
   do j=1,nO
     do i=1,nO
      ij=contract(i,j,nO)
       do l=1,nO
         do k=1,nO
           kl=contract(k,l,nO)
-          X1(k,l,i,j) = X1(k,l,i,j) + gt2TX1(kl,ij)
+          X1(k,l,i,j) = X1(k,l,i,j) + gt2T(kl,ij)
         enddo
       enddo
     enddo
@@ -67,31 +66,27 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Build X2
 ! pure intrinsic fortran equivalent
-! gTt2X2 = matmul(transpose(rOOVV),t2)
+! gTt2 = matmul(transpose(rOOVV),t2)
 ! dgemm
-  call dgemm('T','N',nV**2,nV**2,nO**2,1.d0,rOOVV,nO**2,rt2,nO**2,0.d0,gTt2X2,nV**2)
+  call dgemm('T','N',nV**2,nV**2,nO**2,1.d0,rOOVV,nO**2,rt2,nO**2,0.d0,gTt2,nV**2)
   do d=1,nV
     do c=1,nV
       cd=contract(c,d,nV)
       do b=1,nV
         bd=contract(b,d,nV)
-        X2(b,c) = X2(b,c) + gTt2X2(cd,bd)
+        X2(b,c) = X2(b,c) + gTt2(cd,bd)
       enddo
     enddo
   enddo
 
 ! Build X3
 
-! pure intrinsic fortran equivalent
-! gt2TX3 = matmul(rOOVV,transpose(rt2))
-! dgemm
-  call dgemm('N','T',nO**2,nO**2,nV**2,1.d0,rOOVV,nO**2,rt2,nO**2,0.d0,gt2TX3,nO**2)
   do l=1,nO
     do j=1,nO
       jl=contract(j,l,nO)
       do k=1,nO
         kl=contract(k,l,nO)
-        X3(k,j) = X3(k,j) + gt2TX3(kl,jl)
+        X3(k,j) = X3(k,j) + gt2T(kl,jl)
       enddo
     enddo
   enddo
