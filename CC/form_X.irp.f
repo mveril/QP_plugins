@@ -9,16 +9,18 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
   integer,intent(in)            :: nO,nV
   double precision,intent(in)   :: t2(nO,nO,nV,nV)
   double precision,intent(in)   :: OOVV(nO,nO,nV,nV)
-  double precision              :: rt2(nO**2,nV**2),rOOVV(nO**2,nV**2)
+  double precision              :: rt2(nO**2,nV**2),rOOVV(nO**2,nV**2),rOOVVOV(nO*nV,nO*nV),rt2OV(nO*nV,nO*nV)
 
 ! Local variables
 
   integer                       :: i,j,k,l
   integer                       :: a,b,c,d
-  integer                       :: ij,ab,kl,cd,bd,jl
+  integer                       :: ij,ab,kl,cd,bd,jl,jb,kd,ia,lc,lb,ld
   integer                       :: contract
   double precision              :: gt2T(nO**2,nO**2)
-  double precision              :: gTt2(nV**2,nV**2)
+  double precision              :: gtt2(nv**2,nv**2)
+  double precision              :: gt2OV(nO*nV,nO*nV)
+
 
 ! Output variables
 
@@ -33,10 +35,14 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
     do a=1,nV
       ab=contract(a,b,nV)
       do j=1,nO
+          jb=contract(j,b,nO)
         do i=1,nO
           ij=contract(i,j,nO)
+          ia=contract(i,a,nO)
           rt2(ij,ab)=t2(i,j,a,b)
+          rt2OV(ia,jb)=t2(i,j,a,b)
           rOOVV(ij,ab)=OOVV(i,j,a,b)
+          rOOVVOV(ia,jb)=OOVV(i,j,a,b)
         end do
       end do
     end do
@@ -66,15 +72,15 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 
 ! Build X2
 ! pure intrinsic fortran equivalent
-! gTt2 = matmul(transpose(rOOVV),t2)
+! gt2OV = matmul(-rOOVVOV,-rt2OV))
 ! dgemm
-  call dgemm('T','N',nV**2,nV**2,nO**2,1.d0,rOOVV,nO**2,rt2,nO**2,0.d0,gTt2,nV**2)
-  do d=1,nV
+  call dgemm('N','N',nO*nV,nO*nV,nO*nV,1.d0,-rOOVVOV,nO*nV,-rt2OV,nO*nV,0.d0,gt2OV,nO*nV)
+  do l=1,nO
     do c=1,nV
-      cd=contract(c,d,nV)
+      lc=contract(l,c,nO)
       do b=1,nV
-        bd=contract(b,d,nV)
-        X2(b,c) = X2(b,c) + gTt2(cd,bd)
+        lb=contract(l,b,nO)
+        X2(b,c) = X2(b,c) + gt2OV(lc,lb)
       enddo
     enddo
   enddo
@@ -94,13 +100,13 @@ subroutine form_X(nO,nV,OOVV,t2,X1,X2,X3,X4)
 ! Build X4
 
   do d=1,nV
-    do a=1,nV
-      do l=1,nO
-        do i=1,nO
+    do l=1,nO
+      ld=contract(l,d,nO)
+      do i=1,nO
+        do a=1,nO
+          ia=contract(i,a,nO)
           do k=1,nO
-            do c=1,nV
-              X4(i,l,a,d) = X4(i,l,a,d) + OOVV(k,l,c,d)*t2(i,k,a,c) 
-            enddo
+            X4(i,l,a,d) = X4(i,l,a,d) + gt2OV(ld,ia) 
           enddo
         enddo
       enddo
