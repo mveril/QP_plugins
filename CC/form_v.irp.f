@@ -15,24 +15,56 @@ subroutine form_v(nO,nV,X1,X2,X3,X4,t2,v)
 
 ! Local variables
 
-  integer                       :: i,j,k,l
-  integer                       :: a,b,c,d
+  integer                       :: i,j,ij,k,l,kl
+  integer                       :: a,b,ab,c,d
+  integer                       :: contract 
+  double precision              :: rt2(nO**2,nV**2),rX1(nO**2,nO**2)
+  double precision              :: iqxX1Tt2(nO**2,nV**2)
 
 ! Output variables
 
   double precision,intent(out)  :: v(nO,nO,nV,nV)
-
   v(:,:,:,:) = 0d0
- 
+
+!TODO multithread
+! multithread independent task1
   do b=1,nV
     do a=1,nV
+      ab=contract(a,b,nV)
       do j=1,nO
         do i=1,nO
-          do l=1,nO
-            do k=1,nO
-              v(i,j,a,b) = v(i,j,a,b) + 0.25d0*X1(k,l,i,j)*t2(k,l,a,b)
-            enddo
-          enddo
+          ij=contract(i,j,nO)
+          rt2(ij,ab)=t2(i,j,a,b)
+        end do
+      end do
+    end do
+  end do
+! multithread independent task2
+  
+  do l=1,nO
+    do k=1,nO
+      kl=contract(k,l,nO)
+      do j=1,nO
+        do i=1,nO
+          ij=contract(i,j,nO)
+          rX1(ij,kl)=X1(i,j,k,l)
+        end do
+      end do
+    end do
+  end do
+!End multithread
+
+! pure intrinsic fortran equivalent
+! X1Tt2 = 25d-2*matmul(transpose(rX1),rt2)
+! dgemm
+  call dgemm('T','N',nO**2,nV**2,nO**2,0.25d0,rX1,nO**2,rt2,nO**2,0.d0,iqxX1Tt2,nO**2)
+  do b=1,nV
+    do a=1,nV
+      ab=contract(a,b,nV)
+      do j=1,nO
+        do i=1,nO
+          ij=contract(i,j,nO)
+          v(i,j,a,b) = v(i,j,a,b) + iqxX1Tt2(ij,ab)
         enddo
       enddo
     enddo
