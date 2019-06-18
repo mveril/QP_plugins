@@ -10,7 +10,7 @@ subroutine CCD
   double precision              :: thresh
 
   integer                       :: nBas,nEl
-  double precision              :: ENuc,ERHF
+  double precision              :: ENuc,ETHF
   double precision,allocatable  :: eHF(:)
   double precision,allocatable  :: ERI(:,:,:,:)
 
@@ -56,7 +56,7 @@ subroutine CCD
   nBas=mo_num
   nEl=elec_num
 ! ENuc
-  ERHF=hf_energy
+  ETHF=hf_energy
   allocate(eHF(nBas))
   eHF(:)=fock_matrix_diag_mo(:)
   provide mo_two_e_integrals_in_map
@@ -189,7 +189,7 @@ subroutine CCD
 
 !   Dump resultS
 
-    ECCD = ERHF + EcCCD
+    ECCD = ETHF + EcCCD
 
     write(*,'(1X,A1,1X,I3,1X,A1,1X,F16.10,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X)') &
       '|',nSCF,'|',ECCD,'|',EcCCD,'|',Conv,'|'
