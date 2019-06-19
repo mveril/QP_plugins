@@ -16,7 +16,7 @@ subroutine CCD
 
 ! Local variables
 
-  integer                       :: p,q,r,s
+  integer                       :: p,q,r,s,i,j,a,b
   integer                       :: nBas2
   integer                       :: nO
   integer                       :: nV
@@ -25,6 +25,7 @@ subroutine CCD
   double precision              :: EcMP2
   double precision              :: get_two_e_integral,u_dot_v
   double precision              :: ECCD,EcCCD
+  logical,allocatable           :: socc(:)
   double precision,allocatable  :: seHF(:)
   double precision,allocatable  :: sERI(:,:,:,:)
   double precision,allocatable  :: dbERI(:,:,:,:)
@@ -107,29 +108,65 @@ subroutine CCD
   allocate(eO(nO),eV(nV))
   allocate(delta_OOVV(nO,nO,nV,nV))
 
-  eO(:) = seHF(1:nO)
-  eV(:) = seHF(nO+1:nBas2)
+  allocate(socc(nbas2))
+
+  call spatial_to_spin_occ(mo_num,mo_occ,mo_num*2,socc)
+  do p=1,nbas2
+    if(socc(p)) then
+      eO(count(socc(1:p))) = seHF(p)
+    else
+      eV(count(.not. socc(1:p))) = seHF(p)
+    endif
+  enddo
 
   call form_delta_OOVV(nO,nV,eO,eV,delta_OOVV)
 
   deallocate(seHF)
 
 ! Create integral batches
-
+  
   allocate(OOOO(nO,nO,nO,nO),OOVV(nO,nO,nV,nV),OVOV(nO,nV,nO,nV),VVVV(nV,nV,nV,nV))
+  do s=1,nbas2
+    do r=1,nbas2
+      do q=1,nbas2
+        do p=1,nbas2
+          if(socc(p) .AND. socc(q).AND. socc(r) .AND. socc(s)) then
+            OOOO(count(socc(1:p)),count(socc(1:q)),count(socc(1:r)):,count(socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(socc(p) .AND. socc(q) .AND. .NOT. socc(r) .AND. .NOT. socc(s)) then
+            OOVV(count(socc(1:p)),count(socc(1:q)),count(.NOT. socc(1:r)):,count( .NOT. socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(socc(p) .AND. .NOT. socc(q) .AND. socc(r) .AND. .NOT. socc(s)) then
+            OVOV(count(socc(1:p)), count(.NOT. socc(1:q)),count(socc(1:r)):,count( .NOT. socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if( .NOT. socc(p) .AND. .NOT. socc(q) .AND. .NOT. socc(r) .AND. .NOT. socc(s)) then
+            VVVV(count(.NOT. socc(1:p)), count(.NOT. socc(1:q)),count(.NOT. socc(1:r)),count( .NOT. socc(1:s))) = dbERI(p,q,r,s)
+          endif
+        enddo
+      enddo
+    enddo
+  enddo
 
-  OOOO(:,:,:,:) = dbERI(   1:nO   ,   1:nO   ,   1:nO   ,   1:nO   )
-  OOVV(:,:,:,:) = dbERI(   1:nO   ,   1:nO   ,nO+1:nBas2,nO+1:nBas2)
-  OVOV(:,:,:,:) = dbERI(   1:nO   ,nO+1:nBas2,   1:nO   ,nO+1:nBas2)
-  VVVV(:,:,:,:) = dbERI(nO+1:nBas2,nO+1:nBas2,nO+1:nBas2,nO+1:nBas2)
+  deallocate(socc)
 
   deallocate(dbERI)
  
 ! MP2 guess amplitudes
 
   allocate(t2(nO,nO,nV,nV))
-
-  t2(:,:,:,:) = -OOVV(:,:,:,:)/delta_OOVV(:,:,:,:)
+  do b=1,nV
+    do a=1,nV
+      do j=1,nO
+        do i=1,nO
+          if(delta_OOVV(i,j,a,b) == 0d0) then
+            t2(i,j,a,b) = 0d0
+          else
+            t2(i,j,a,b) = -OOVV(i,j,a,b)/delta_OOVV(i,j,a,b)
+          end if
+        end do
+      end do
+    end do
+  end do
 
   EcMP2 = 0.25d0*u_dot_v(pack(OOVV,.true.),pack(t2,.true.),size(OOVV))
   write(*,'(1X,A10,1X,F10.6)') 'Ec(MP2) = ',EcMP2
@@ -172,7 +209,6 @@ subroutine CCD
     call form_v(nO,nV,X1,X2,X3,X4,t2,v)
 
 !   Compute residual
-
     r2(:,:,:,:) = OOVV(:,:,:,:) + delta_OOVV(:,:,:,:)*t2(:,:,:,:) + u(:,:,:,:) + v(:,:,:,:)
 
 !   Check convergence 
@@ -181,7 +217,17 @@ subroutine CCD
   
 !   Update amplitudes
 
-    t2(:,:,:,:) = t2(:,:,:,:) - r2(:,:,:,:)/delta_OOVV(:,:,:,:)
+    do b=1,nV
+      do a=1,nV
+        do j=1,nO
+          do i=1,nO
+            if(delta_OOVV(i,j,a,b) /= 0d0) then
+              t2(i,j,a,b) =  t2(i,j,a,b) - r2(i,j,a,b)/delta_OOVV(i,j,a,b)
+            end if
+          end do
+        end do
+      end do
+    end do
 
 !   Compute correlation energy
 
