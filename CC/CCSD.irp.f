@@ -17,7 +17,7 @@ subroutine CCSD
 
 ! Local variables
 
-  integer                       :: p,q,r,s
+  integer                       :: p,q,r,s,i,j,a,b
   double precision              :: start_CCSDT,end_CCSDT,t_CCSDT
   integer                       :: nBas2
   integer                       :: nO
@@ -45,6 +45,7 @@ subroutine CCSD
   double precision,allocatable  :: VVVO(:,:,:,:)
   double precision,allocatable  :: VVVV(:,:,:,:)
 
+  logical,allocatable           :: socc(:)
   double precision,allocatable  :: eO(:)
   double precision,allocatable  :: eV(:)
   double precision,allocatable  :: hvv(:,:)
@@ -121,13 +122,20 @@ subroutine CCSD
   nO = nEl
   nV = nBas2 - nO
 
-! Form energy denominator
+! Form energy denominator  
 
+  allocate(socc(nbas2))
+  call spatial_to_spin_occ(mo_num,mo_occ,mo_num*2,socc)
   allocate(eO(nO),eV(nV))
   allocate(delta_OV(nO,nV),delta_OOVV(nO,nO,nV,nV))
 
-  eO(:) = seHF(1:nO)
-  eV(:) = seHF(nO+1:nBas2)
+  do p=1,nbas2
+    if(socc(p)) then
+      eO(count(socc(1:p))) = seHF(p)
+    else
+      eV(count(.not. socc(1:p))) = seHF(p)
+    endif
+  enddo
 
   call form_delta_OV(nO,nV,eO,eV,delta_OV)
   call form_delta_OOVV(nO,nV,eO,eV,delta_OOVV)
@@ -142,16 +150,45 @@ subroutine CCSD
            OVVV(nO,nV,nV,nV),VOVV(nV,nO,nV,nV),VVVO(nV,nV,nV,nO), & 
            VVVV(nV,nV,nV,nV))
 
-  OOOO(:,:,:,:) = dbERI(   1:nO   ,   1:nO   ,   1:nO   ,   1:nO   )
-  OOOV(:,:,:,:) = dbERI(   1:nO   ,   1:nO   ,   1:nO   ,nO+1:nBas2)
-  OVOO(:,:,:,:) = dbERI(   1:nO   ,nO+1:nBas2,   1:nO   ,   1:nO   )
-  VOOO(:,:,:,:) = dbERI(nO+1:nBas2,   1:nO   ,   1:nO   ,   1:nO   )
-  OOVV(:,:,:,:) = dbERI(   1:nO   ,   1:nO   ,nO+1:nBas2,nO+1:nBas2)
-  OVVO(:,:,:,:) = dbERI(   1:nO   ,nO+1:nBas2,nO+1:nBas2,   1:nO   )
-  OVVV(:,:,:,:) = dbERI(   1:nO   ,nO+1:nBas2,nO+1:nBas2,nO+1:nBas2)
-  VOVV(:,:,:,:) = dbERI(nO+1:nBas2,   1:nO   ,nO+1:nBas2,nO+1:nBas2)
-  VVVO(:,:,:,:) = dbERI(nO+1:nBas2,nO+1:nBas2,nO+1:nBas2,   1:nO   )
-  VVVV(:,:,:,:) = dbERI(nO+1:nBas2,nO+1:nBas2,nO+1:nBas2,nO+1:nBas2)
+  do s=1,nbas2
+    do r=1,nbas2
+      do q=1,nbas2
+        do p=1,nbas2
+          if(socc(p) .AND. socc(q) .AND. socc(r) .AND. socc(s)) then
+            OOOO(count(socc(1:p)),count(socc(1:q)),count(socc(1:r)):,count(socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(socc(p) .AND. socc(q) .AND. socc(r) .AND. .NOT. socc(s)) then
+            OOOV(count(socc(1:p)),count(socc(1:q)),count(socc(1:r)):,count(.NOT. socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(socc(p) .AND. .NOT. socc(q) .AND. socc(r) .AND. socc(s)) then
+            OVOO(count(socc(1:p)),count(.NOT. socc(1:q)),count(socc(1:r)):,count(socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(.NOT. socc(p) .AND. socc(q) .AND. socc(r) .AND. socc(s)) then
+            VOOO(count(.NOT. socc(1:p)),count(socc(1:q)),count(socc(1:r)),count(socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(socc(p) .AND. socc(q) .AND. .NOT. socc(r) .AND. .NOT. socc(s)) then
+            OOVV(count(socc(1:p)),count(socc(1:q)),count(.NOT. socc(1:r)),count( .NOT. socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(socc(p) .AND. .NOT. socc(q) .AND. .NOT. socc(r) .AND. socc(s)) then
+            OVVO(count(socc(1:p)),count(.NOT. socc(1:q)),count(.NOT. socc(1:r)),count(socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(socc(p) .AND. .NOT. socc(q) .AND. .NOT. socc(r) .AND. .NOT. socc(s)) then
+            OVVV(count(socc(1:p)),count(.NOT. socc(1:q)),count(.NOT. socc(1:r)), count(.NOT. socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(.NOT. socc(p) .AND. socc(q) .AND. .NOT. socc(r) .AND. .NOT. socc(s)) then
+            VOVV(count(.NOT. socc(1:p)),count(socc(1:q)),count(.NOT. socc(1:r)),count(.NOT. socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(.NOT. socc(p) .AND. .NOT. socc(q) .AND. .NOT. socc(r) .AND. socc(s)) then
+            VVVO(count(.NOT. socc(1:p)),count(.NOT. socc(1:q)),count(.NOT. socc(1:r)), count(socc(1:s))) = dbERI(p,q,r,s)
+          endif
+          if(.NOT. socc(p) .AND. .NOT. socc(q) .AND. .NOT. socc(r) .AND. .NOT. socc(s)) then
+            VVVV(count(.NOT. socc(1:p)),count(.NOT. socc(1:q)),count(.NOT. socc(1:r)), count(.NOT. socc(1:s))) = dbERI(p,q,r,s)
+          endif
+        enddo
+      enddo
+    enddo
+  enddo
+  deallocate(socc)
 
   deallocate(dbERI)
  
@@ -160,7 +197,19 @@ subroutine CCSD
   allocate(t1(nO,nV),t2(nO,nO,nV,nV),tau(nO,nO,nV,nV))
 
   t1(:,:)     = 0d0
-  t2(:,:,:,:) = -OOVV(:,:,:,:)/delta_OOVV(:,:,:,:)
+  do b=1,nV
+    do a=1,nV
+      do j=1,nO
+        do i=1,nO
+          if(delta_OOVV(i,j,a,b)==0d0) then
+            t2(i,j,a,b) = 0d0
+          else
+            t2(i,j,a,b) = -OOVV(i,j,a,b)/delta_OOVV(i,j,a,b)
+          end if
+       enddo
+     enddo
+   enddo
+ enddo
   call form_tau(nO,nV,t1,t2,tau)
 
   EcMP2 = 0.5d0*u_dot_v(pack(OOVV,.true.),pack(tau,.true.),size(OOVV))
@@ -214,9 +263,24 @@ subroutine CCSD
     Conv = max(maxval(abs(r1(:,:))),maxval(abs(r2(:,:,:,:))))
 
 !   Update 
-
-    t1(:,:)      = t1(:,:)     - r1(:,:)    /delta_OV  (:,:)
-    t2(:,:,:,:)  = t2(:,:,:,:) - r2(:,:,:,:)/delta_OOVV(:,:,:,:)
+    do a=1,nV
+      do i=1,nO
+        if(delta_OV(i,a) /= 0d0) then
+          t1(i,a)      = t1(i,a)     - r1(i,a)    /delta_OV  (i,a)
+        endif
+      enddo
+    enddo
+    do b=1,nV
+      do a=1,nV
+        do j=1,nO
+          do i=1,nO
+            if(delta_OOVV(i,j,a,b) /= 0d0) then
+              t2(i,j,a,b) =  t2(i,j,a,b) - r2(i,j,a,b)/delta_OOVV(i,j,a,b)
+            end if
+          end do
+        end do
+      end do
+    end do
 
     call form_tau(nO,nV,t1,t2,tau)
  
