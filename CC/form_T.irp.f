@@ -29,11 +29,11 @@ subroutine form_T(nO,nV,delta_OOOVVV,ub,ubb,EcCCT)
         do k=1,nO
           do j=1,nO
             do i=1,nO
-
-              EcCCT = EcCCT                                &
+              if(delta_OOOVVV(i,j,k,a,b,c) /= 0d0) then
+                EcCCT = EcCCT                                &
                     + (ub(i,j,k,a,b,c) + ubb(i,j,k,a,b,c)) &
                     * ubb(i,j,k,a,b,c)/delta_OOOVVV(i,j,k,a,b,c) 
-
+              endif
             end do
           end do
         end do
