@@ -54,19 +54,20 @@ subroutine CCD
   maxSCF=cc_n_it_max
   thresh=cc_thresh
 
-  nBas=mo_num
-  nEl=elec_num
+  nBas=n_act_orb
+  nEl=elec_num-sum(mo_occ(1:n_core_orb))
+  print *, nBas,nEl
 ! ENuc
   ETHF=hf_energy
   allocate(eHF(nBas))
-  eHF(:)=fock_matrix_diag_mo(:)
+  eHF(:)=fock_matrix_diag_mo(n_core_orb+1:nBas+n_core_orb)
   provide mo_two_e_integrals_in_map
   allocate(ERI(nBas,nBas,nBas,nBas))
   do s=1,nBas
     do r=1,nBas
       do q=1,nBas
         do p=1,nBas 
-          ERI(p,q,r,s)=get_two_e_integral(p,q,r,s,mo_two_e_integrals_in_map)
+          ERI(p,q,r,s)=get_two_e_integral(p+n_core_orb,q+n_core_orb,r+n_core_orb,s+n_core_orb,mo_two_e_integrals_in_map)
         end do
       end do
     end do
@@ -110,7 +111,7 @@ subroutine CCD
 
   allocate(socc(nbas2))
 
-  call spatial_to_spin_occ(mo_num,mo_occ,mo_num*2,socc)
+  call spatial_to_spin_occ(nBas,mo_occ(n_core_orb+1:nBas+n_core_orb),nBas2,socc)
   do p=1,nbas2
     if(socc(p)) then
       eO(count(socc(1:p))) = seHF(p)
