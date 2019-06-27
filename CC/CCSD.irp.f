@@ -11,7 +11,7 @@ subroutine CCSD
 
   logical                       :: doCCSDT
   integer                       :: nBas,nEl
-  double precision              :: ERHF
+  double precision              :: ETHF
   double precision,allocatable  :: eHF(:)
   double precision,allocatable  :: ERI(:,:,:,:)
 
@@ -83,7 +83,7 @@ subroutine CCSD
   end if
   nBas=mo_num
   nEl=elec_num
-  ERHF=hf_energy
+  ETHF=hf_energy
   allocate(eHF(nBas))
   eHF(:)=fock_matrix_diag_mo(:)
   provide mo_two_e_integrals_in_map
@@ -290,7 +290,7 @@ subroutine CCSD
 
 !   Dump results
 
-    ECCSD = ERHF + EcCCSD
+    ECCSD = ETHF + EcCCSD
 
     write(*,'(1X,A1,1X,I3,1X,A1,1X,F16.10,1X,A1,1X,F10.6,1X,A1,1X,F10.6,1X,A1,1X)') &
       '|',nSCF,'|',ECCSD,'|',EcCCSD,'|',Conv,'|'
